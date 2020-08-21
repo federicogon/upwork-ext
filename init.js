@@ -4,7 +4,7 @@ console.log('== INIT Upwork extension.');
 function loadDefaultValues() {
     Array.from(document.querySelectorAll('div[name=timeFrom] ul.eo-dropdown-menu li a:not(.active)')).find(el => el.textContent === '9:00am').click();
     Array.from(document.querySelectorAll('div[name=timeTo] ul.eo-dropdown-menu li a:not(.active)')).find(el => el.textContent === '5:00pm').click();
-    let memo = document.getElementById('memo');
+    let memo = document.querySelector('textarea[name=memo].ng-pristine');
     memo.value = 'REGULAR';
     memo.dispatchEvent(new Event('change'));
 }
