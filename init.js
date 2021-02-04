@@ -2,26 +2,26 @@
 console.log('== INIT Upwork extension.');
 
 
-function selectTime(name, time) {
-    let dropdowns = document.querySelectorAll('div[name=' + name + '] ul.eo-dropdown-menu li a:not(.active)');
+function selectTime(modal, name, time) {
+    let dropdowns = modal.querySelectorAll('div[name=' + name + '] ul.eo-dropdown-menu li a:not(.active)');
     if (dropdowns.length) {
         let item = Array.from(dropdowns).find(el => el.textContent === time);
         if (item) item.click();
     }
 }
 
-function loadDefaultValues() {
+function loadDefaultValues(modal) {
     console.log('++ Setting default Values...');
-    selectTime('timeFrom', '09:00');
-    selectTime('timeTo', '17:00');
-    document.querySelectorAll('textarea[name=memo]').forEach(memo => {
+    selectTime(modal, 'timeFrom', '09:00');
+    selectTime(modal, 'timeTo', '17:00');
+    modal.querySelectorAll('textarea[name=memo]').forEach(memo => {
         memo.value = 'REGULAR';
         memo.dispatchEvent(new Event('change'));
     });
 }
 
-function addDefaultValuesLink() {
-    let modalTitle = document.querySelectorAll('div[slot="header-title"]');
+function addDefaultValuesLink(modal) {
+    let modalTitle = modal.querySelectorAll('div[slot="header-title"]');
     if (modalTitle.length) {
         modalTitle.forEach(el => {
             let a = document.createElement('a');
@@ -29,7 +29,7 @@ function addDefaultValuesLink() {
             a.href = '#';
             a.onclick = (e) => {
                 e.preventDefault();
-                loadDefaultValues();
+                loadDefaultValues(modal);
             }
             el.appendChild(a);
         });
@@ -38,14 +38,18 @@ function addDefaultValuesLink() {
     }
 }
 
-function watchModal() {
+function waitForModal() {
     console.log('++ Waiting for MODAL...');
-    if (document.querySelectorAll('div[slot="header-title"]').length) {
-        loadDefaultValues();
-        addDefaultValuesLink();
-        return;
+    let modals = document.querySelectorAll('up-c-modal');
+    for (let i = 0; i < modals.length; i++) {
+        const display = window.getComputedStyle(modals[i]).display;
+        if (display === 'inline') {
+            loadDefaultValues(modals[i]);
+            addDefaultValuesLink(modals[i]);
+            return;
+        }
     }
-    setTimeout(watchModal, 100);
+    setTimeout(waitForModal, 100);
 }
 
 function isAddManualTimeButton(el) {
@@ -54,5 +58,5 @@ function isAddManualTimeButton(el) {
 
 console.log('++ Listening...');
 document.addEventListener('click', (e) => {
-    if (isAddManualTimeButton(e)) watchModal();
+    if (isAddManualTimeButton(e)) waitForModal();
 }, false);
